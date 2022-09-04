@@ -2,7 +2,7 @@
   "name": "battle-sockets",
   "version": "1.0.0",
   "description": "Turn based battle game powered by socket.io",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/aPruner/battle-sockets/issues"
   },
-  "homepage": "https://github.com/aPruner/battle-sockets#readme"
+  "homepage": "https://github.com/aPruner/battle-sockets#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "socket.io": "^4.5.2"
+  }
 }
