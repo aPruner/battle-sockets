@@ -1,0 +1,19 @@
+{
+  "name": "battle-sockets",
+  "version": "1.0.0",
+  "description": "Turn based battle game powered by socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aPruner/battle-sockets.git"
+  },
+  "author": "Adam Pruner",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aPruner/battle-sockets/issues"
+  },
+  "homepage": "https://github.com/aPruner/battle-sockets#readme"
+}
