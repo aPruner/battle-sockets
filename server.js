@@ -13,10 +13,10 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('a client connected');
-  socket.emit('connection');
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+  console.log('a client connected', socket.id);
+  socket.emit('welcome_client', socket.id);
+  socket.on('ready', (socket) => {
+    console.log(`${socket.id} has readied up`);
   });
 });
 

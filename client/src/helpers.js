@@ -5,6 +5,8 @@ const DEFAULT_CHARACTER_STATS = {
   SPD: 10
 };
 
+
+// TODO: Make this return a random character
 export function generateCharacter() {
  return {
   ...DEFAULT_CHARACTER_STATS
