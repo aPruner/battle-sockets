@@ -1,9 +1,11 @@
 import { socket } from './socket'
-import { generateCharacter } from './helpers'
+import { generateCharacter, renderCharInfo } from './helpers'
 import { useEffect, useState } from 'react'
 
 function App() {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [character, setCharacter] = useState(null)
+  const [characterName, setCharacterName] = useState('')
 
   useEffect(() => {
     const logWelcome = (id) => {
@@ -21,9 +23,16 @@ function App() {
     }
   }, [])
 
-  const character = generateCharacter('Adam')
   const readyUp = () => {
     socket.emit('ready', JSON.stringify(character))
+  }
+
+  const generateNewCharacter = (name) => {
+    const newCharacter = generateCharacter(name)
+    setCharacter(newCharacter)
+
+    // Reset the character name after generating a character
+    setCharacterName('')
   }
 
   return (
@@ -31,15 +40,30 @@ function App() {
       <div>
         <h1>Welcome to Battle Sockets</h1>
 
-        <p>Character info:</p>
-
         {isPlaying ? (
           <div>The game has started!</div>
         ) : (
           <div>
-            <button onClick={generateCharacter}>Generate new character</button>
-
-            <button onClick={readyUp}>Ready</button>
+            <div>
+              <label>Character Name:</label>
+              <input
+                type="text"
+                onChange={(e) => setCharacterName(e.target.value)}
+              ></input>
+              <button
+                onClick={() => generateNewCharacter(characterName)}
+                disabled={!characterName}
+              >
+                Generate new character
+              </button>
+              <p>Character info:</p>
+              {renderCharInfo(character)}
+            </div>
+            <div>
+              <button onClick={readyUp} disabled={!character}>
+                Ready
+              </button>
+            </div>
           </div>
         )}
       </div>

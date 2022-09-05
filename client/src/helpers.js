@@ -15,6 +15,10 @@ export function generateCharacter(name) {
 };
 
 export function renderCharInfo(character) {
+  if (!character) {
+    return;
+  }
+
   return Object.keys(character).map((attribute, i) => {
     return (
       <p key={i}>{`${attribute}:${character[attribute]}`}</p>
