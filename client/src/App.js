@@ -2,8 +2,11 @@ import { io } from "socket.io-client";
 
 function App() {
   // Maybe put this in a use effect?
-  const socket = io("localhost:3001");
-  console.log(socket);
+  const socket = io('localhost:3001');
+
+  socket.on('connection', () => {
+    console.log('connected to server');
+  })
 
   return (
     <div className="App">
