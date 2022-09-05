@@ -16,7 +16,9 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   if (Object.keys(playerSockets).length === 2) {
-    console.log('a client attempted to connect, but the room is already full. disconnecting said client')
+    console.log(
+      'a client attempted to connect, but the room is already full. disconnecting said client',
+    )
     socket.disconnect()
     return
   }
@@ -35,8 +37,15 @@ io.on('connection', (socket) => {
       }
     }
 
-    io.emit('game_start')
-    console.log('All connected clients have successfully readied up, the game is starting')
+    const socketIdToCharsMap = { ...playerSockets }
+    for (const id of Object.keys(socketIdToCharsMap)) {
+      delete socketIdToCharsMap[id].socket
+    }
+
+    io.emit('game_start', JSON.stringify(socketIdToCharsMap))
+    console.log(
+      'All connected clients have successfully readied up, the game is starting',
+    )
   })
 })
 

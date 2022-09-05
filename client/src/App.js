@@ -21,7 +21,15 @@ function App() {
       setServerIsFull(true)
     }
 
-    const startPlaying = () => setIsPlaying(true)
+    const startPlaying = (playerSocketsStr) => {
+      const playerSockets = JSON.parse(playerSocketsStr);
+      for (const id of Object.keys(playerSockets)) {
+        if (id !== socket.id) {
+          setEnemyCharacter(playerSockets[id].character)
+        }
+      }
+      setIsPlaying(true)
+    }
 
     socket.on('connect_client', handleConnection)
     socket.on('disconnect', handleDisconnection)
@@ -55,6 +63,7 @@ function App() {
               <div>The game has started!</div>
               <div>
                 <p>Enemy character info:</p>
+                {renderCharInfo(enemyCharacter)}
               </div>
             </div>
           ) : (
