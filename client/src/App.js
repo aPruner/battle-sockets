@@ -4,21 +4,31 @@ import { useEffect, useState } from 'react'
 
 function App() {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isConnected, setIsConnected] = useState(false)
+  const [serverIsFull, setServerIsFull] = useState(false)
   const [character, setCharacter] = useState(null)
+  const [enemyCharacter, setEnemyCharacter] = useState(null)
   const [characterName, setCharacterName] = useState('')
 
   useEffect(() => {
-    const logWelcome = (id) => {
+    const handleConnection = (id) => {
       console.log('connected to server', id)
+      setIsConnected(true)
+    }
+
+    const handleDisconnection = () => {
+      console.log('could not connect to server, it is already full')
+      setServerIsFull(true)
     }
 
     const startPlaying = () => setIsPlaying(true)
 
-    socket.on('welcome_client', logWelcome)
+    socket.on('connect_client', handleConnection)
+    socket.on('disconnect', handleDisconnection)
     socket.on('game_start', startPlaying)
 
     return () => {
-      socket.off('welcome_client', logWelcome)
+      socket.off('connect_client', handleConnection)
       socket.off('game_start', startPlaying)
     }
   }, [])
@@ -39,32 +49,42 @@ function App() {
     <div className="App">
       <div>
         <h1>Welcome to Battle Sockets</h1>
-
-        {isPlaying ? (
-          <div>The game has started!</div>
+        {isConnected ? (
+          isPlaying ? (
+            <div>
+              <div>The game has started!</div>
+              <div>
+                <p>Enemy character info:</p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div>
+                <label>Character Name:</label>
+                <input
+                  type="text"
+                  onChange={(e) => setCharacterName(e.target.value)}
+                ></input>
+                <button
+                  onClick={() => generateNewCharacter(characterName)}
+                  disabled={!characterName}
+                >
+                  Generate new character
+                </button>
+                <p>Character info:</p>
+                {renderCharInfo(character)}
+              </div>
+              <div>
+                <button onClick={readyUp} disabled={!character}>
+                  Ready
+                </button>
+              </div>
+            </div>
+          )
+        ) : serverIsFull ? (
+          <div>Tried to connect to server but it is full</div>
         ) : (
-          <div>
-            <div>
-              <label>Character Name:</label>
-              <input
-                type="text"
-                onChange={(e) => setCharacterName(e.target.value)}
-              ></input>
-              <button
-                onClick={() => generateNewCharacter(characterName)}
-                disabled={!characterName}
-              >
-                Generate new character
-              </button>
-              <p>Character info:</p>
-              {renderCharInfo(character)}
-            </div>
-            <div>
-              <button onClick={readyUp} disabled={!character}>
-                Ready
-              </button>
-            </div>
-          </div>
+          <div>You are not yet connected to the server</div>
         )}
       </div>
     </div>

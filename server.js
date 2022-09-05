@@ -15,10 +15,15 @@ app.get('/', (req, res) => {
 })
 
 io.on('connection', (socket) => {
+  if (Object.keys(playerSockets).length === 2) {
+    console.log('a client attempted to connect, but the room is already full. disconnecting said client')
+    socket.disconnect()
+    return
+  }
   playerSockets[socket.id] = { socket, ready: false, character: null }
   console.log('a client connected', socket.id)
   console.log('logging all clients:', Object.keys(playerSockets))
-  socket.emit('welcome_client', socket.id)
+  socket.emit('connect_client', socket.id)
   socket.on('ready', (character) => {
     console.log(`${socket.id} has readied up with character: ${character}`)
     playerSockets[socket.id].ready = true
