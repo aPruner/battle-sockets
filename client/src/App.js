@@ -9,6 +9,7 @@ function App() {
   const [character, setCharacter] = useState(null)
   const [enemyCharacter, setEnemyCharacter] = useState(null)
   const [characterName, setCharacterName] = useState('')
+  const [hasChosenAction, setHasChosenAction] = useState(false)
 
   useEffect(() => {
     const handleConnection = (id) => {
@@ -22,7 +23,7 @@ function App() {
     }
 
     const startPlaying = (playerSocketsStr) => {
-      const playerSockets = JSON.parse(playerSocketsStr);
+      const playerSockets = JSON.parse(playerSocketsStr)
       for (const id of Object.keys(playerSockets)) {
         if (id !== socket.id) {
           setEnemyCharacter(playerSockets[id].character)
@@ -31,12 +32,28 @@ function App() {
       setIsPlaying(true)
     }
 
+    const handlePlayingTurn = (socketIdToResultingCharsStr) => {
+      console.log('Playing out the turn')
+      setHasChosenAction(false)
+
+      const socketIdToResultingChars = JSON.parse(socketIdToResultingCharsStr)
+      for (const id of Object.keys(socketIdToResultingChars)) {
+        if (id === socket.id) {
+          setCharacter({ ...socketIdToResultingChars[id] })
+        } else {
+          setEnemyCharacter({ ...socketIdToResultingChars[id] })
+        }
+      }
+    }
+
     socket.on('connect_client', handleConnection)
     socket.on('disconnect', handleDisconnection)
     socket.on('game_start', startPlaying)
+    socket.on('playing_turn', handlePlayingTurn)
 
     return () => {
       socket.off('connect_client', handleConnection)
+      socket.off('disconnect', handleDisconnection)
       socket.off('game_start', startPlaying)
     }
   }, [])
@@ -53,6 +70,11 @@ function App() {
     setCharacterName('')
   }
 
+  const chooseAction = (action) => {
+    socket.emit('choose_action', action)
+    setHasChosenAction(true)
+  }
+
   return (
     <div className="App">
       <div>
@@ -62,9 +84,30 @@ function App() {
             <div>
               <div>The game has started!</div>
               <div>
+                <p>Your character info:</p>
+                {renderCharInfo(character)}
                 <p>Enemy character info:</p>
                 {renderCharInfo(enemyCharacter)}
               </div>
+
+              <button
+                onClick={() => chooseAction('attack')}
+                disabled={hasChosenAction}
+              >
+                Attack
+              </button>
+              <button
+                onClick={() => chooseAction('deflect')}
+                disabled={hasChosenAction}
+              >
+                Deflect
+              </button>
+              <button
+                onClick={() => chooseAction('recover')}
+                disabled={hasChosenAction}
+              >
+                Recover
+              </button>
             </div>
           ) : (
             <div>
