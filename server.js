@@ -15,8 +15,8 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log('a client connected', socket.id);
   socket.emit('welcome_client', socket.id);
-  socket.on('ready', () => {
-    console.log(`${socket.id} has readied up`);
+  socket.on('ready', (character) => {
+    console.log(`${socket.id} has readied up with character: ${character}`);
   });
 });
 

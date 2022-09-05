@@ -7,8 +7,9 @@ const DEFAULT_CHARACTER_STATS = {
 
 
 // TODO: Make this return a random character
-export function generateCharacter() {
+export function generateCharacter(name) {
  return {
+  name,
   ...DEFAULT_CHARACTER_STATS
  }
 };

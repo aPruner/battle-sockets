@@ -16,9 +16,9 @@ function App() {
     }
   }, [])
 
-  const character = generateCharacter();
+  const character = generateCharacter("Adam");
   const readyUp = () => {
-    socket.emit('ready', character);
+    socket.emit('ready', JSON.stringify(character));
   }
 
   return (
@@ -29,7 +29,7 @@ function App() {
         <p>Character info:</p>
 
         <div>
-          <button>
+          <button onClick={generateCharacter}>
             Generate new character
           </button>
 
