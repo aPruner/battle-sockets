@@ -35,13 +35,14 @@ function App() {
     const handlePlayingTurn = (socketIdToResultingCharsStr) => {
       console.log('Playing out the turn')
       setHasChosenAction(false)
-
+      console.log('before parse: ', socketIdToResultingCharsStr)
       const socketIdToResultingChars = JSON.parse(socketIdToResultingCharsStr)
+      console.log('after parse: ', socketIdToResultingChars);
       for (const id of Object.keys(socketIdToResultingChars)) {
         if (id === socket.id) {
-          setCharacter({ ...socketIdToResultingChars[id] })
+          setCharacter({ ...socketIdToResultingChars[id].character })
         } else {
-          setEnemyCharacter({ ...socketIdToResultingChars[id] })
+          setEnemyCharacter({ ...socketIdToResultingChars[id].character })
         }
       }
     }

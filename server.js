@@ -16,6 +16,15 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })
 
+const findEnemySocketId = (socketId) => {
+  for (const id of Object.keys(playerSockets)) {
+    if (id !== socketId) {
+      return id
+    }
+  }
+  return null
+}
+
 const handleReady = (socket, character) => {
   console.log(`${socket.id} has readied up with character: ${character}`)
   playerSockets[socket.id].ready = true
@@ -39,6 +48,7 @@ const handleReady = (socket, character) => {
 }
 
 const handleChooseAction = (socket, action) => {
+  console.log(`player ${socket.id} chose to ${action} this turn`)
   allNextTurnActions[socket.id] = action
 
   if (Object.keys(allNextTurnActions).length === 2) {
@@ -53,19 +63,32 @@ const handleChooseAction = (socket, action) => {
     }
 
     for (const action of actionsQueue) {
+      const actingCharacter = { ...playerSockets[action.id].character }
+      const enemySocketId = findEnemySocketId(action.id)
+      const enemyCharacter = { ...playerSockets[enemySocketId].character }
+
+      // TODO: Right now, the actions don't care about each other yet
+      // TODO: Also, right now, there is no action order due to SPD
+
       // Do some math and mutate the character objs inside of playerSockets map
       if (action.action === 'attack') {
-        
+        enemyCharacter.HP -=
+          actingCharacter.ATK - Math.round(enemyCharacter.DEF / 2)
       } else if (action.action === 'deflect') {
-
+        actingCharacter.DEF += 5
       } else {
-
+        actingCharacter.HP += Math.round(actingCharacter.DEF / 2)
       }
+
+      // Copy the mutated characters into the playerSockets map
+      playerSockets[enemySocketId].character = { ...enemyCharacter }
+      playerSockets[action.id].character = { ...actingCharacter }
     }
 
-    const socketIdToCharsMap = { ...playerSockets }
-    for (const id of Object.keys(socketIdToCharsMap)) {
-      delete socketIdToCharsMap[id].socket
+    // Pull out the socketIdToCharsMap from the playerSockets map
+    const socketIdsToCharsMap = { ...playerSockets }
+    for (const id of Object.keys(socketIdsToCharsMap)) {
+      delete socketIdsToCharsMap[id].socket
     }
 
     io.emit('playing_turn', JSON.stringify(socketIdsToCharsMap))
