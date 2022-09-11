@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })
 
+// Helpers
 const findEnemySocketId = (socketId) => {
   for (const id of Object.keys(playerSockets)) {
     if (id !== socketId) {
@@ -23,6 +24,20 @@ const findEnemySocketId = (socketId) => {
     }
   }
   return null
+}
+
+const actionExistsFromEachPlayer = (actions, playerSockets) => {
+  const actionsIdList = Object.keys(actions)
+  const playerSocketsIdList = Object.keys(playerSockets)
+  if (actionsIdList.length !== playerSocketsIdList.length) {
+    return false
+  }
+  for (const id of actionsIdList) {
+    if (!playerSocketsIdList.includes(id)) {
+      return false
+    }
+  }
+  return true
 }
 
 const handleReady = (socket, character) => {
@@ -51,7 +66,7 @@ const handleChooseAction = (socket, action) => {
   console.log(`player ${socket.id} chose to ${action} this turn`)
   allNextTurnActions[socket.id] = action
 
-  if (Object.keys(allNextTurnActions).length === 2) {
+  if (actionExistsFromEachPlayer(allNextTurnActions, playerSockets)) {
     // TODO: Extract this out into a function called playTurn()
     console.log(
       'all players have chosen an action for this turn. Now playing out the turn',
@@ -91,6 +106,7 @@ const handleChooseAction = (socket, action) => {
       delete socketIdsToCharsMap[id].socket
     }
 
+    allNextTurnActions = {};
     io.emit('playing_turn', JSON.stringify(socketIdsToCharsMap))
   }
 }
